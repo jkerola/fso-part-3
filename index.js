@@ -56,6 +56,15 @@ app.post('/api/persons', (req, res) => {
       }
     )
   }
+  const existingContact = persons.find(person => person.name.toLowerCase() === body.name.toLowerCase())
+  console.log(existingContact)
+  if (existingContact) {
+    return res.status(400).json(
+      {
+        'error': `${body.name} already exists in phonebook`
+      }
+    )
+  }
   const contact = {
     ...body,
     "id": Math.random(100000)
