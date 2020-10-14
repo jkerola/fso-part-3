@@ -1,4 +1,4 @@
-const { response, request } = require('express')
+const { res, req } = require('express')
 const bodyParser = require('body-parser')
 
 const express = require('express')
@@ -6,7 +6,7 @@ const app = express()
 
 app.use(express.json())
 
-const persons = [
+let persons = [
   {
     "name": "Arto Hellas",
     "number": "040-123456",
@@ -29,21 +29,32 @@ const persons = [
   }
 ]
 // GET routes
-app.get('/info', (request, response) => { // API INFO
+app.get('/info', (req, res) => { // API INFO
   const currentDate = new Date()
   const message = `Phonebook has information on ${persons.length} contacts!<br/>${currentDate}`
-  response.send(message)
+  res.send(message)
 })
-app.get('/api/persons', (request, response) => { // ALL CONTACTS
-  response.json(persons)
+app.get('/api/persons', (req, res) => { // ALL CONTACTS
+  res.json(persons)
 })
-app.get('/api/persons/:id', (request, response) => { // UNIQUE CONTACT
-  const id = Number(request.params.id)
+app.get('/api/persons/:id', (req, res) => { // UNIQUE CONTACT
+  const id = Number(req.params.id)
   const contact = persons.find(person => person.id === id)
   if (contact) {
-    response.json(contact)
+    res.json(contact)
   } else {
-    response.status(404).end()
+    res.status(404).end()
+  }
+})
+// DELETE ROUTES
+app.delete('/api/persons/:id', (req, res) => {
+  const id = Number(req.params.id)
+  const removedContact = persons.find(person => person.id == id)
+  if (removedContact) {
+    persons = persons.filter(person => person.id != id)
+    res.status(204).end()
+  } else {
+    res.status(404).end()
   }
 })
 const PORT = 3001
