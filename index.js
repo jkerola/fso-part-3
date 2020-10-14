@@ -1,6 +1,10 @@
-const { response } = require('express')
+const { response, request } = require('express')
+const bodyParser = require('body-parser')
+
 const express = require('express')
 const app = express()
+
+app.use(express.json())
 
 const persons = [
   {
@@ -33,7 +37,15 @@ app.get('/info', (request, response) => { // API INFO
 app.get('/api/persons', (request, response) => { // ALL CONTACTS
   response.json(persons)
 })
-
+app.get('/api/persons/:id', (request, response) => { // UNIQUE CONTACT
+  const id = Number(request.params.id)
+  const contact = persons.find(person => person.id === id)
+  if (contact) {
+    response.json(contact)
+  } else {
+    response.status(404).end()
+  }
+})
 const PORT = 3001
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`)
