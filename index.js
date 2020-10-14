@@ -1,5 +1,4 @@
 const { res, req } = require('express')
-const bodyParser = require('body-parser')
 
 const express = require('express')
 const app = express()
@@ -46,8 +45,26 @@ app.get('/api/persons/:id', (req, res) => { // UNIQUE CONTACT
     res.status(404).end()
   }
 })
+// POST ROUTES
+app.post('/api/persons', (req, res) => {
+  const body = req.body
+  if (!body.name || !body.number) {
+    const missing = body.name ? 'number' : 'name'
+    return res.status(400).json(
+      {
+        'error': `no ${missing} content`
+      }
+    )
+  }
+  const contact = {
+    ...body,
+    "id": Math.random(100000)
+  }
+  persons = persons.concat(contact)
+  res.json(contact)
+})
 // DELETE ROUTES
-app.delete('/api/persons/:id', (req, res) => {
+app.delete('/api/persons/:id', (req, res) => { // DELETE CONTACT
   const id = Number(req.params.id)
   const removedContact = persons.find(person => person.id == id)
   if (removedContact) {
