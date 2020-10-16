@@ -7,8 +7,8 @@ const Contact = require('./models/Contact')
 const app = express()
 
 // custom morgan token for body content
-morgan.token('body', function (req, res) { 
-  if (req.body && req.method=='POST') {
+morgan.token('body', function (req, res) {
+  if (req.body && req.method == 'POST') {
     return JSON.stringify(req.body)
   } else return ' ' // if no body content, return this to keep console clean
 })
@@ -72,20 +72,13 @@ app.post('/api/persons', (req, res) => {
       }
     )
   }
-  const existingContact = persons.find(person => person.name.toLowerCase() === body.name.toLowerCase())
-  if (existingContact) {
-    return res.status(400).json(
-      {
-        'error': `${body.name} already exists in phonebook`
-      }
-    )
-  }
-  const contact = {
+  const contact = new Contact({
     ...body,
-    "id": Math.random(100000)
-  }
-  persons = persons.concat(contact)
-  res.json(contact)
+  })
+  contact.save().then(response => {
+    console.log('new contact saved.')
+    res.json(response)
+  })
 })
 // DELETE ROUTES
 app.delete('/api/persons/:id', (req, res) => { // DELETE CONTACT
