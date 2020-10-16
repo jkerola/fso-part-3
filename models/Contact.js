@@ -16,8 +16,8 @@ Mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFind
   })
 
 const contactSchema = new Mongoose.Schema({
-  name: {type: String, required: true, minlength: 1, unique: true},
-  number: {type: String, required: true, minlength: 0}
+  name: {type: String, required: true, minlength: 3, unique: true},
+  number: {type: String, required: true, minlength: 8}
 })
 contactSchema.plugin(UniqueValidator)
 
