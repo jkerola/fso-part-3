@@ -54,14 +54,16 @@ app.get('/api/persons', (req, res, next) => { // ALL CONTACTS
   })
     .catch(error => next(error))
 })
-app.get('/api/persons/:id', (req, res) => { // UNIQUE CONTACT
-  const id = Number(req.params.id)
-  const contact = persons.find(person => person.id === id)
-  if (contact) {
-    res.json(contact)
-  } else {
-    res.status(404).end()
-  }
+app.get('/api/persons/:id', (req, res, next) => { // UNIQUE CONTACT
+  Contact.findById(req.params.id)
+    .then(contact => {
+      if (contact) {
+        res.json(contact)
+      } else {
+        res.status(404).end()
+      }
+    })
+    .catch(error => next(error))
 })
 // POST ROUTES
 app.post('/api/persons', (req, res, next) => {
@@ -90,6 +92,23 @@ app.delete('/api/persons/:id', (req, res, next) => { // DELETE CONTACT
       res.status(204).end()
     })
     .catch(error => next(error))
+})
+// PUT ROUIES
+app.put('/api/persons/:id', (req, res, next) => {
+  const id = req.params.id
+  const body = req.body
+  const update = {
+    name: body.name,
+    number: body.number,
+  }
+  if (!body.name || !body.number) {
+    return res.status(400).send({ error: 'missing body content' })
+  }
+  Contact.findByIdAndUpdate(id, update, { new: true })
+  .then(result => {
+    res.json(result)
+  })
+  .catch(erro => next(error))
 })
 
 // errorHandler from example at

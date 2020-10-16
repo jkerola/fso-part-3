@@ -2,3 +2,4 @@ node_modules
 requests
 puhelinluettelo
 .env
+.rest
