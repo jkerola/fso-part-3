@@ -3,6 +3,7 @@ const morgan = require('morgan')
 const cors = require('cors')
 require('dotenv').config()
 const Contact = require('./models/Contact')
+const { response } = require('express')
 
 const app = express()
 
@@ -46,11 +47,12 @@ app.get('/info', (req, res) => { // API INFO
   const message = `Phonebook has information on ${persons.length} contacts!<br/>${currentDate}`
   res.send(message)
 })
-app.get('/api/persons', (req, res) => { // ALL CONTACTS
+app.get('/api/persons', (req, res, next) => { // ALL CONTACTS
   //res.json(persons)
   Contact.find({}).then(contacts => {
     res.json(contacts)
   })
+    .catch(error => next(error))
 })
 app.get('/api/persons/:id', (req, res) => { // UNIQUE CONTACT
   const id = Number(req.params.id)
@@ -62,7 +64,7 @@ app.get('/api/persons/:id', (req, res) => { // UNIQUE CONTACT
   }
 })
 // POST ROUTES
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
   const body = req.body
   if (!body.name || !body.number) {
     const missing = body.name ? 'number' : 'name'
@@ -76,21 +78,38 @@ app.post('/api/persons', (req, res) => {
     ...body,
   })
   contact.save().then(response => {
-    console.log('new contact saved.')
+    console.log('new contact saved')
     res.json(response)
   })
+    .catch(error => next(error))
 })
 // DELETE ROUTES
-app.delete('/api/persons/:id', (req, res) => { // DELETE CONTACT
-  const id = Number(req.params.id)
-  const removedContact = persons.find(person => person.id == id)
-  if (removedContact) {
-    persons = persons.filter(person => person.id != id)
-    res.status(204).end()
-  } else {
-    res.status(404).end()
-  }
+app.delete('/api/persons/:id', (req, res, next) => { // DELETE CONTACT
+  Contact.findByIdAndRemove(req.params.id)
+    .then(result => {
+      res.status(204).end()
+    })
+    .catch(error => next(error))
 })
+
+// errorHandler from example at
+//https://fullstackopen.com/osa3/tietojen_tallettaminen_mongo_db_tietokantaan#virheidenkasittelyn-keskittaminen-middlewareen
+const errorHandler = (error, req, res, next) => {
+  console.error(error.message)
+  if (error.name === 'CastError') {
+    console.log('been here')
+    return res.status(400).send({ error: 'malformatted id' })
+  }
+  next(error)
+}
+app.use(errorHandler)
+
+// unknown endpoint middleware
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+app.use(unknownEndpoint)
+
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`)
