@@ -1,0 +1,8 @@
+PUT http://localhost:3001/api/persons/5f8990ce044873e36527610f
+Content-Type: application/json
+
+{
+    "name": "Janne Kerola",
+    "number": "123 2032",
+    "id": "5f8869c592486d5db628d837"
+}
