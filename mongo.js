@@ -19,8 +19,6 @@ if (process.argv.length < 2) {
   process.exit(1)
 }
 
-const password = process.argv[2]
-const appName = 'phonebook'
 const url = process.env.MONGODB_URI
 mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
 
@@ -48,7 +46,7 @@ if (name && number) {
     number,
     id: Math.random()
   })
-  contact.save().then(response => {
+  contact.save().then(() => {
     console.log('contact added')
     mongoose.connection.close()
   })

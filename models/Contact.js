@@ -8,7 +8,7 @@ const url = process.env.MONGODB_URI
 //https://fullstackopen.com/osa3/tietojen_tallettaminen_mongo_db_tietokantaan
 console.log('connecting...')
 Mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
-  .then(result => {
+  .then(() => {
     console.log('connection succesfull!')
   })
   .catch((error) => {
@@ -16,8 +16,8 @@ Mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFind
   })
 
 const contactSchema = new Mongoose.Schema({
-  name: {type: String, required: true, minlength: 3, unique: true},
-  number: {type: String, required: true, minlength: 8}
+  name: { type: String, required: true, minlength: 3, unique: true },
+  number: { type: String, required: true, minlength: 8 }
 })
 contactSchema.plugin(UniqueValidator)
 
