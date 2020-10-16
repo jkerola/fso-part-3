@@ -45,10 +45,10 @@ let persons = [
 app.get('/info', (req, res) => { // API INFO
   const currentDate = new Date()
   Contact.find({})
-  .then(result => {
-    const message = `Phonebook has information on ${result.length} contacts!<br/>${currentDate}`
-    res.send(message)
-  })
+    .then(result => {
+      const message = `Phonebook has information on ${result.length} contacts!<br/>${currentDate}`
+      res.send(message)
+    })
 })
 app.get('/api/persons', (req, res, next) => { // ALL CONTACTS
   //res.json(persons)
@@ -83,7 +83,6 @@ app.post('/api/persons', (req, res, next) => {
     ...body,
   })
   contact.save().then(response => {
-    console.log('new contact saved')
     res.json(response)
   })
     .catch(error => next(error))
@@ -109,14 +108,14 @@ app.put('/api/persons/:id', (req, res, next) => {
     return res.status(400).send({ error: `missing ${missing} content` })
   }
   Contact.findByIdAndUpdate(id, update, { new: true })
-  .then(result => {
-    if (result) {
-      res.json(result)
-    } else {
-      res.status(404).send({error: 'not found'})
-    }
-  })
-  .catch(erro => next(error))
+    .then(result => {
+      if (result) {
+        res.json(result)
+      } else {
+        res.status(404).send({ error: 'not found' })
+      }
+    })
+    .catch(error => next(error))
 })
 
 // errorHandler from example at
@@ -124,8 +123,9 @@ app.put('/api/persons/:id', (req, res, next) => {
 const errorHandler = (error, req, res, next) => {
   console.error(error.message)
   if (error.name === 'CastError') {
-    console.log('been here')
     return res.status(400).send({ error: 'malformatted id' })
+  } else if (error.name === 'ValidationError') {
+    return res.status(400).send({ error: error.message })
   }
   next(error)
 }
