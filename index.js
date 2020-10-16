@@ -44,8 +44,11 @@ let persons = [
 // GET routes
 app.get('/info', (req, res) => { // API INFO
   const currentDate = new Date()
-  const message = `Phonebook has information on ${persons.length} contacts!<br/>${currentDate}`
-  res.send(message)
+  Contact.find({})
+  .then(result => {
+    const message = `Phonebook has information on ${result.length} contacts!<br/>${currentDate}`
+    res.send(message)
+  })
 })
 app.get('/api/persons', (req, res, next) => { // ALL CONTACTS
   //res.json(persons)
@@ -102,11 +105,16 @@ app.put('/api/persons/:id', (req, res, next) => {
     number: body.number,
   }
   if (!body.name || !body.number) {
-    return res.status(400).send({ error: 'missing body content' })
+    const missing = !body.name ? 'number' : 'name'
+    return res.status(400).send({ error: `missing ${missing} content` })
   }
   Contact.findByIdAndUpdate(id, update, { new: true })
   .then(result => {
-    res.json(result)
+    if (result) {
+      res.json(result)
+    } else {
+      res.status(404).send({error: 'not found'})
+    }
   })
   .catch(erro => next(error))
 })
